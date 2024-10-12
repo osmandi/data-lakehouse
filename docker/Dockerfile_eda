@@ -1,0 +1,7 @@
+FROM python:3.10
+
+COPY requirements_eda.txt requirements_eda.txt
+
+RUN pip install -r requirements_eda.txt
+
+USER 1000
