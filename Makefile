@@ -1,17 +1,22 @@
-# Check for the existence of Docker and Podman
-DOCKER := docker
-PODMAN := podman
+CONTAINER_ENGINE := docker
 
-ifeq ($(shell command -v $(DOCKER) > /dev/null 2>&1 && echo true), true)
-    CONTAINER_ENGINE := $(DOCKER)
-else ifeq ($(shell command -v $(PODMAN) > /dev/null 2>&1 && echo true), true)
-    CONTAINER_ENGINE := $(PODMAN)
-else
-    $(error Neither container engine (Docker or Podman) is installed. Please install one of them.)
-endif
+build:
+	${CONTAINER_ENGINE} build --file ./docker/Dockerfile_eda -t eda ./docker
+
+dev_eda:
+	mkdir -p notebooks
+	${CONTAINER_ENGINE} build --file ./docker/Dockerfile_dev_eda -t dev_eda ./docker
+	${CONTAINER_ENGINE} run -p 8888:8888 -v ./raw_data:/home/jovyan/raw_data -v ./notebooks:/home/jovyan/notebooks dev_eda
 
 # EDA reports
 eda:
-	@echo "Hello eda"
-	${CONTAINER_ENGINE} run hello-world
-	@echo "The container engine in use is: $(CONTAINER_ENGINE)"
+	mkdir -p eda/dataframes
+	mkdir -p eda/reports
+	${CONTAINER_ENGINE} build --file ./docker/Dockerfile_dev_eda -t eda ./docker
+	${CONTAINER_ENGINE} run --rm -v ./scripts:/scripts -v ./eda:/home/eda -v ./raw_data:/home/raw_data \
+		eda \
+		python /scripts/EDA.py \
+	|| rm -rf eda
+
+# Run allways
+#.PHONY: eda
