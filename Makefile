@@ -20,7 +20,7 @@ eda:
 
 # Dremio
 dremio-build:
-	${CONTAINER_ENGINE} docker run -d -p 9047:9047 -p 31010:31010 -p 45678:45678 -p 32010:32010 --name dremio dremio/dremio-oss:24.2
+	${CONTAINER_ENGINE} run -d -p 9047:9047 -p 31010:31010 -p 45678:45678 -p 32010:32010 --name dremio dremio/dremio-oss:25.1
 dremio-start:
 	${CONTAINER_ENGINE} start dremio
 dremio-stop:
