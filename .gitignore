@@ -1,3 +1,4 @@
 data_example/
 eda/
 notebooks/
+.env
