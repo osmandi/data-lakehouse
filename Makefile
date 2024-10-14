@@ -32,5 +32,10 @@ dremio-start:
 dremio-stop:
 	${CONTAINER_ENGINE} stop dremio
 
+# Remove folders used for create reports and dataset
+clean:
+	rm -rf eda
+	rm -rf data_example
+
 # Run allways
 #.PHONY: eda
