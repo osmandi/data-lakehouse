@@ -71,7 +71,7 @@ locales = pd.read_csv(f"{raw_data_dir}/Locales_202104.csv", sep=";", encoding="l
 licencias = pd.read_csv(f"{raw_data_dir}/Licencias_Locales_202104.csv", sep=";", encoding="latin-1")
 
 # Generate EDA
-generate_eda(locales, "locales", eda_report_dir)
-generate_eda(terrazas, "terrazas", eda_report_dir)
-generate_eda(licencias, "licencias", eda_report_dir)
+generate_eda(locales, "Locales_202104", eda_report_dir)
+generate_eda(terrazas, "Terrazas_202104", eda_report_dir)
+generate_eda(licencias, "Licencias_Locales_202104", eda_report_dir)
 generate_eda(books, "books", eda_report_dir, exclude_colums_eda=["authors" , "categories"])
