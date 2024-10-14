@@ -34,7 +34,7 @@ def generate_sweetviz_report(df: pd.DataFrame, title: str, path: str):
     df_report.show_html(f"{path}/reports/{title}_EDA.html")
 
 def generate_parquet(df: pd.DataFrame, title: str, path: str):
-    df.to_parquet(f"{path}/dataframes/{title}_cleaned.parquet", index=False)
+    df.to_parquet(f"{path}/dataframes/{title}.parquet", index=False)
 
 def generate_eda(df: pd.DataFrame, title: str, path: str, exclude_colums_eda: Optional[List[str]] = None):
 
