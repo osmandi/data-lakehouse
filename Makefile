@@ -34,16 +34,40 @@ dremio-stop:
 	${CONTAINER_ENGINE} stop dremio
 
 # Generate token
-# TODO: Generate dremio token
+# TODO: Improve dremio token creation
 dremio-token:
 	@DREMIO_TOKEN=$(shell curl -X POST '$(DREMIO_HOST)/apiv2/login' \
 		--header 'Content-Type: application/json' \
 		--data-raw '{ "userName": "$(DREMIO_USERNAME)", "password": "$(DREMIO_PASSWORD)"}' | jq -c ".token"); \
 		echo $$DREMIO_TOKEN > TOKEN
 
+# Create drmeio source
+dremio-source-nessie:
+	curl -X POST '$(DREMIO_HOST)/api/v3/catalog' \
+		--header 'Authorization: $(DREMIO_TOKEN)' \
+		--header 'Content-Type: application/json' \
+		--data-raw '{"entityType": "source", "type": "NESSIE", "name": "nessie", "config": {"nessieEndpoint": "http://nessie:19120/api/v2", "nessieAuthType": "NONE","credentialType": "ACCESS_KEY", "awsAccessKey": "$(MINIO_ROOT_USER)", "awsAccessSecret": "$(MINIO_ROOT_PASSWORD)", "awsRootPath": "/lakehouse", "secure": false, "propertyList": [{"name": "fs.s3a.path.style.access", "value": true}, {"name": "fs.s3a.endpoint", "value": "minio:9000"}, {"name": "dremio.s3.compat", "value": true}]}}'
+
+dremio-source-minio-eda:
+	curl -X POST '$(DREMIO_HOST)/api/v3/catalog' \
+		--header 'Authorization: $(DREMIO_TOKEN)' \
+		--header 'Content-Type: application/json' \
+		--data-raw '{"entityType": "source", "type": "S3", "name": "minio-eda",  "config": {"accessKey": "$(MINIO_ROOT_USER)", "accessSecret": "$(MINIO_ROOT_PASSWORD)", "secure": false, "propertyList": [{"name": "fs.s3a.path.style.access", "value": true}, {"name": "fs.s3a.endpoint", "value": "minio:9000"}, {"name": "dremio.s3.compat", "value": true}], "rootPath": "/eda", "compatibilityMode": true, "credentialType": "ACCESS_KEY"}, "metadataPolicy":{"authTTLMs":86400000,"namesRefreshMs":3600000,"datasetRefreshAfterMs":3600000,"datasetExpireAfterMs":10800000,"datasetUpdateMode":"PREFETCH_QUERIED","deleteUnavailableDatasets":true,"autoPromoteDatasets":true}}'
+
+dremio-source-minio-raw:
+	curl -X POST '$(DREMIO_HOST)/api/v3/catalog' \
+		--header 'Authorization: $(DREMIO_TOKEN)' \
+		--header 'Content-Type: application/json' \
+		--data-raw '{"entityType": "source", "type": "S3", "name": "minio-raw",  "config": {"accessKey": "$(MINIO_ROOT_USER)", "accessSecret": "$(MINIO_ROOT_PASSWORD)", "secure": false, "propertyList": [{"name": "fs.s3a.path.style.access", "value": true}, {"name": "fs.s3a.endpoint", "value": "minio:9000"}, {"name": "dremio.s3.compat", "value": true}], "rootPath": "/raw", "compatibilityMode": true, "credentialType": "ACCESS_KEY"}, "metadataPolicy":{"authTTLMs":86400000,"namesRefreshMs":3600000,"datasetRefreshAfterMs":3600000,"datasetExpireAfterMs":10800000,"datasetUpdateMode":"PREFETCH_QUERIED","deleteUnavailableDatasets":true,"autoPromoteDatasets":true}}'
+
+
+# "metadataPolicy": { "autoPromoteDatasets": true},
+# 8421adcf-2e15-43f8-b02a-de1bb32a9614
+#		--data-raw '{"entityType": "source", "type": "NESSIE", "name": "nessie", "config": { "rootPath": "lakehouse", "accessKey": "$(MINIO_ROOT_USER)", "accessSecret": "$(MINIO_ROOT_PASSWORD)", "secure": false, "propertyList": [{"name": "fs.s3a.path.style.access", "value": true}, {"name": "fs.s3a.endpoint", "value": "minio:9000"}, {"name": "dremio.s3.compat", "value": true}], "compatibilityMode": true, "defaultCtasFormat": "ICEBERG", "credentialType": "ACCESS_KEY"}}'
+
+
 dremio-catalog:
-	@DREMIO_TOKEN=$(shell cat TOKEN); \
-		curl -X GET '$(DREMIO_HOST)/api/v3/catalog' \
+	curl -X GET '$(DREMIO_HOST)/api/v3/catalog' \
 		--header 'Authorization: $(DREMIO_TOKEN)' \
 		--header 'Content-Type: application/json'
 

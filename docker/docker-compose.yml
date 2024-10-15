@@ -1,5 +1,3 @@
-version: "3"
-
 services:
   dremio:
     platform: linux/x86_64
@@ -13,43 +11,43 @@ services:
       - DREMIO_JAVA_SERVER_EXTRA_OPTS=-Dpaths.dist=file:///opt/dremio/data/dist
     networks:
       data-lakehouse:
-  # minio:
-  #   image: minio/minio
-  #   container_name: minio
-  #   environment:
-  #     - MINIO_ROOT_USER=$MINIO_ROOT_USER
-  #     - MINIO_ROOT_PASSWORD=$MINIO_ROOT_PASSWORD
-  #     - MINIO_DOMAIN=$MINIO_DOMAIN
-  #     - MINIO_REGION_NAME=$MINIO_REGION_NAME
-  #     - MINIO_REGION=$MINIO_REGION
-  #   ports:
-  #     - 9001:9001
-  #     - 9000:9000
-  #   volumes:
-  #     - ../data_example:/minio_data/raw
-  #     - ../eda/dataframes:/minio_data/eda
-  #   entrypoint: >
-  #     /bin/sh -c "
-  #     minio server /data --console-address ':9001' &
-  #     sleep 5;
-  #     mc alias set myminio http://localhost:9000 $MINIO_ROOT_USER $MINIO_ROOT_PASSWORD;
-  #     mc mb myminio/raw;
-  #     mc mb myminio/eda;
-  #     mc mb myminio/lakehouse;
-  #     mc cp --recursive /minio_data/raw/* myminio/raw;
-  #     mc cp --recursive /minio_data/eda/* myminio/eda;
-  #     tail -f /dev/null"
-  #   networks:
-  #     data-lakehouse:
-  # nessie:
-  #   image: projectnessie/nessie:latest
-  #   container_name: nessie
-  #   volumes:
-  #     - ../nessie-data:/nessie/data
-  #   ports:
-  #     - 19120:19120
-  #   networks:
-  #     data-lakehouse:
+  minio:
+    image: minio/minio
+    container_name: minio
+    environment:
+      - MINIO_ROOT_USER=$MINIO_ROOT_USER
+      - MINIO_ROOT_PASSWORD=$MINIO_ROOT_PASSWORD
+      - MINIO_DOMAIN=$MINIO_DOMAIN
+      - MINIO_REGION_NAME=$MINIO_REGION_NAME
+      - MINIO_REGION=$MINIO_REGION
+    ports:
+      - 9001:9001
+      - 9000:9000
+    volumes:
+      - ../data_example:/minio_data/raw
+      - ../eda/dataframes:/minio_data/eda
+    entrypoint: >
+      /bin/sh -c "
+      minio server /data --console-address ':9001' &
+      sleep 5;
+      mc alias set myminio http://localhost:9000 $MINIO_ROOT_USER $MINIO_ROOT_PASSWORD;
+      mc mb myminio/raw;
+      mc mb myminio/eda;
+      mc mb myminio/lakehouse;
+      mc cp --recursive /minio_data/raw/* myminio/raw;
+      mc cp --recursive /minio_data/eda/* myminio/eda;
+      tail -f /dev/null"
+    networks:
+      data-lakehouse:
+  nessie:
+    image: projectnessie/nessie:latest
+    container_name: nessie
+    volumes:
+      - ../nessie-data:/nessie/data
+    ports:
+      - 19120:19120
+    networks:
+      data-lakehouse:
 
 networks:
   data-lakehouse:
