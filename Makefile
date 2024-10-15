@@ -1,4 +1,5 @@
 CONTAINER_ENGINE := docker
+include ./.env
 
 # Generate data_example folder to unzipt raw_data
 data_example:
@@ -31,6 +32,43 @@ dremio-start:
 	${CONTAINER_ENGINE} start dremio
 dremio-stop:
 	${CONTAINER_ENGINE} stop dremio
+
+# Generate token
+# TODO: Generate dremio token
+dremio-token:
+	@DREMIO_TOKEN=$(shell curl -X POST '$(DREMIO_HOST)/apiv2/login' \
+		--header 'Content-Type: application/json' \
+		--data-raw '{ "userName": "$(DREMIO_USERNAME)", "password": "$(DREMIO_PASSWORD)"}' | jq -c ".token"); \
+		echo $$DREMIO_TOKEN > TOKEN
+
+dremio-catalog:
+	@DREMIO_TOKEN=$(shell cat TOKEN); \
+		curl -X GET '$(DREMIO_HOST)/api/v3/catalog' \
+		--header 'Authorization: $(DREMIO_TOKEN)' \
+		--header 'Content-Type: application/json'
+
+dremio-catalog-id:
+		curl -X GET '$(DREMIO_HOST)/api/v3/catalog/1795fc88-bcc3-422c-ba8a-7b22ad72d011' \
+		--header 'Authorization: $(DREMIO_TOKEN)' \
+		--header 'Content-Type: application/json'
+	
+dremio-create-space:
+	curl -X POST '$(DREMIO_HOST)/api/v3/catalog' \
+	--header 'Authorization: $(DREMIO_TOKEN)' \
+	--header 'Content-Type: application/json' \
+	--data-raw '{"entityType": "space", "name": "Analista Grande"}'
+
+dremio-sql:
+	curl -X POST '$(DREMIO_HOST)/api/v3/sql' \
+	--header 'Authorization: $(DREMIO_TOKEN)' \
+	--header 'Content-Type: application/json' \
+	--data-raw '{"sql": "CREATE VIEW \"@username\".temp_view AS SELECT * FROM \"@username\".books LIMIT 10;"}'
+
+dremio-format:
+		curl -X POST '$(DREMIO_HOST)/api/v3/catalog/1795fc88-bcc3-422c-ba8a-7b22ad72d011' \
+		--header 'Authorization: $(DREMIO_TOKEN)' \
+		--header 'Content-Type: application/json' \
+		--data-raw '{"entityType": "dataset", "path": ["Licencias_Locales_202104.parquet"], "type": "PHYSICAL_DATASET", "format": {"type": "Parquet"}}'
 
 # Remove folders used for create reports and dataset
 clean:
