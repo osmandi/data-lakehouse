@@ -86,13 +86,55 @@ dremio-sql:
 	curl -X POST '$(DREMIO_HOST)/api/v3/sql' \
 	--header 'Authorization: $(DREMIO_TOKEN)' \
 	--header 'Content-Type: application/json' \
-	--data-raw '{"sql": "CREATE VIEW \"@username\".temp_view AS SELECT * FROM \"@username\".books LIMIT 10;"}'
+	--data-raw '{"sql": "CREATE TABLE nessie.books_table AS (SELECT * FROM \"minio-eda\".\"books.parquet\");"}'
 
 dremio-format:
 		curl -X POST '$(DREMIO_HOST)/api/v3/catalog/1795fc88-bcc3-422c-ba8a-7b22ad72d011' \
 		--header 'Authorization: $(DREMIO_TOKEN)' \
 		--header 'Content-Type: application/json' \
 		--data-raw '{"entityType": "dataset", "path": ["Licencias_Locales_202104.parquet"], "type": "PHYSICAL_DATASET", "format": {"type": "Parquet"}}'
+
+
+# Steps
+lakehouse-load-data:
+	# books
+	curl -X POST '$(DREMIO_HOST)/api/v3/sql' \
+	--header 'Authorization: $(DREMIO_TOKEN)' \
+	--header 'Content-Type: application/json' \
+	--data-raw '{"sql": "CREATE TABLE IF NOT EXISTS nessie.books AS (SELECT * FROM \"minio-eda\".\"books.parquet\");"}'; \
+	# Licencias_Locales_202104
+	curl -X POST '$(DREMIO_HOST)/api/v3/sql' \
+	--header 'Authorization: $(DREMIO_TOKEN)' \
+	--header 'Content-Type: application/json' \
+	--data-raw '{"sql": "CREATE TABLE IF NOT EXISTS nessie.Licencias_Locales_202104 AS (SELECT * FROM \"minio-eda\".\"Licencias_Locales_202104.parquet\");"}'; \
+	# Locales_202104
+	curl -X POST '$(DREMIO_HOST)/api/v3/sql' \
+	--header 'Authorization: $(DREMIO_TOKEN)' \
+	--header 'Content-Type: application/json' \
+	--data-raw '{"sql": "CREATE TABLE IF NOT EXISTS nessie.Locales_202104 AS (SELECT * FROM \"minio-eda\".\"Locales_202104.parquet\");"}'; \
+	# Terrazas_202104
+	curl -X POST '$(DREMIO_HOST)/api/v3/sql' \
+	--header 'Authorization: $(DREMIO_TOKEN)' \
+	--header 'Content-Type: application/json' \
+	--data-raw '{"sql": "CREATE TABLE IF NOT EXISTS nessie.Terrazas_202104 AS (SELECT * FROM \"minio-eda\".\"Terrazas_202104.parquet\");"}'
+
+lakehouse-spaces:
+	# Analista 1
+	curl -X POST '$(DREMIO_HOST)/api/v3/catalog' \
+	--header 'Authorization: $(DREMIO_TOKEN)' \
+	--header 'Content-Type: application/json' \
+	--data-raw '{"entityType": "space", "name": "Analista 1"}'; \
+	# Analista 2
+	curl -X POST '$(DREMIO_HOST)/api/v3/catalog' \
+	--header 'Authorization: $(DREMIO_TOKEN)' \
+	--header 'Content-Type: application/json' \
+	--data-raw '{"entityType": "space", "name": "Analista 2"}'; \
+	# Analista 3
+	curl -X POST '$(DREMIO_HOST)/api/v3/catalog' \
+	--header 'Authorization: $(DREMIO_TOKEN)' \
+	--header 'Content-Type: application/json' \
+	--data-raw '{"entityType": "space", "name": "Analista 3"}'
+
 
 # Remove folders used for create reports and dataset
 clean:
