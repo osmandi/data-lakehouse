@@ -140,6 +140,9 @@ lakehouse-spaces:
 # 	--header 'Content-Type: application/json' \
 # 	--data-raw '{"sql": "CREATE FOLDER IF NOT EXISTS nessie.etl;"}'
 
+lakehouse-etl:
+	$(CONTAINER_ENGINE) run -v ./scripts:/home/docker/scripts --env-file ./.env alexmerced/spark33-notebook /bin/bash -c "python3 /home/docker/scripts/ETL.py"
+
 
 # Remove folders used for create reports and dataset
 clean:
