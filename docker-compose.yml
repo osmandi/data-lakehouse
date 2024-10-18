@@ -49,10 +49,16 @@ services:
       - ./notebooks:/home/jovyan/work/notebooks
     ports:
       - 8888:8888
+
   etl:
     image: alexmerced/spark33-notebook
     container_name: etl
     env_file: ./.env
+    volumes:
+      - ./scripts:/home/docker/scripts
+    command: >
+      /bin/bash -c "python3 /home/docker/scripts/ETL.py"
+
   postgres:
     image: postgres:12.19
     container_name: postgres
