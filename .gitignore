@@ -4,3 +4,4 @@ notebooks/
 .env
 **.zip
 .DREMIO_TOKEN
+.DS_Store
