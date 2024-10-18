@@ -85,7 +85,7 @@ lakehouse-sources:
 	curl -X POST '$(DREMIO_HOST)/api/v3/catalog' \
 		--header 'Authorization: $(DREMIO_TOKEN)' \
 		--header 'Content-Type: application/json' \
-		--data-raw '{"entityType": "source", "type": "NESSIE", "name": "nessie", "config": {"nessieEndpoint": "http://nessie:19120/api/v2", "nessieAuthType": "NONE","credentialType": "ACCESS_KEY", "awsAccessKey": "$(MINIO_ROOT_USER)", "awsAccessSecret": "$(MINIO_ROOT_PASSWORD)", "awsRootPath": "/lakehouse", "secure": false, "propertyList": [{"name": "fs.s3a.path.style.access", "value": true}, {"name": "fs.s3a.endpoint", "value": "minio:9000"}, {"name": "dremio.s3.compat", "value": true}]}}' ; \
+		--data-raw '{"entityType": "source", "type": "NESSIE", "name": "nessie", "config": {"nessieEndpoint": "http://nessie:19120/api/v2", "nessieAuthType": "NONE","credentialType": "ACCESS_KEY", "awsAccessKey": "$(AWS_ACCESS_KEY_ID)", "awsAccessSecret": "$(AWS_SECRET_ACCESS_KEY)", "awsRootPath": "/lakehouse", "secure": false, "propertyList": [{"name": "fs.s3a.path.style.access", "value": true}, {"name": "fs.s3a.endpoint", "value": "minio:9000"}, {"name": "dremio.s3.compat", "value": true}]}}' ; \
 	curl -X POST '$(DREMIO_HOST)/api/v3/catalog' \
 		--header 'Authorization: $(DREMIO_TOKEN)' \
 		--header 'Content-Type: application/json' \
