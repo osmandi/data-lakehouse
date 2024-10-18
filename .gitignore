@@ -3,3 +3,4 @@ eda/
 notebooks/
 .env
 **.zip
+.DREMIO_TOKEN
