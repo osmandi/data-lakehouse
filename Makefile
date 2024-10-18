@@ -25,16 +25,15 @@ eda:
 		python /scripts/EDA.py \
 	|| rm -rf eda
 
-# Dremio
-dremio-build:
-	${CONTAINER_ENGINE} run -d -p 9047:9047 -p 31010:31010 -p 45678:45678 -p 32010:32010 --name dremio dremio/dremio-oss:25.1
-dremio-start:
-	${CONTAINER_ENGINE} start dremio
-dremio-stop:
-	${CONTAINER_ENGINE} stop dremio
+# # Dremio
+# dremio-build:
+# 	${CONTAINER_ENGINE} run -d -p 9047:9047 -p 31010:31010 -p 45678:45678 -p 32010:32010 --name dremio dremio/dremio-oss:25.1
+# dremio-start:
+# 	${CONTAINER_ENGINE} start dremio
+# dremio-stop:
+# 	${CONTAINER_ENGINE} stop dremio
 
 # Generate token
-# TODO: Improve dremio token creation
 dremio-token:
 	@DREMIO_TOKEN=$(shell curl -X POST '$(DREMIO_HOST)/apiv2/login' \
 		--header 'Content-Type: application/json' \
@@ -135,11 +134,11 @@ lakehouse-spaces:
 	--header 'Content-Type: application/json' \
 	--data-raw '{"entityType": "space", "name": "Analista 3"}'
 
-dremio-create-nessie-folder:
-	curl -X POST '$(DREMIO_HOST)/api/v3/sql' \
-	--header 'Authorization: $(DREMIO_TOKEN)' \
-	--header 'Content-Type: application/json' \
-	--data-raw '{"sql": "CREATE FOLDER IF NOT EXISTS nessie.etl;"}'
+# dremio-create-nessie-folder:
+# 	curl -X POST '$(DREMIO_HOST)/api/v3/sql' \
+# 	--header 'Authorization: $(DREMIO_TOKEN)' \
+# 	--header 'Content-Type: application/json' \
+# 	--data-raw '{"sql": "CREATE FOLDER IF NOT EXISTS nessie.etl;"}'
 
 
 # Remove folders used for create reports and dataset

@@ -1,3 +1,6 @@
+-- Create nessie folder
+CREATE FOLDER IF NOT EXISTS nessie.etl;
+
 -- Analista 1
 ---- Terraza_001
 -- SELECT LISTAGG(COLUMN_NAME, ', ') columns_filtered FROM INFORMATION_SCHEMA."COLUMNS"
