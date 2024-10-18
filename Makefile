@@ -1,11 +1,12 @@
 CONTAINER_ENGINE := docker
-include ./.env
 
 # Generate data_example folder to unzipt raw_data
 data_example:
 	${CONTAINER_ENGINE} run --rm -v ./:/home/data alpine:3.20.3 sh -c "cd /home/data && unzip ./otros_origenes_de_datos.zip" \
 	|| rm -rf data_example
 	
+include ./.env
+
 dev-eda:
 	mkdir -p notebooks
 	${CONTAINER_ENGINE} build --file ./docker/Dockerfile_eda -t dev_eda ./docker
