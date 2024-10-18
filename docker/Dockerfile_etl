@@ -1,0 +1,4 @@
+FROM jupyter/pyspark-notebook:spark-3.3.0
+
+RUN mkdir -p /home/jovyan/.jupyter/lab/user-settings/@jupyterlab/apputils-extension && \
+  echo '{"theme":"JupyterLab Dark"}' > /home/jovyan/.jupyter/lab/user-settings/@jupyterlab/apputils-extension/themes.jupyterlab-settings 

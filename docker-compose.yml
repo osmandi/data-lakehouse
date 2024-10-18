@@ -9,23 +9,21 @@ services:
     container_name: dremio
     environment:
       - DREMIO_JAVA_SERVER_EXTRA_OPTS=-Dpaths.dist=file:///opt/dremio/data/dist
-    networks:
-      data-lakehouse:
   minio:
     image: minio/minio
     container_name: minio
     environment:
       - MINIO_ROOT_USER=$MINIO_ROOT_USER
       - MINIO_ROOT_PASSWORD=$MINIO_ROOT_PASSWORD
-      - MINIO_DOMAIN=$MINIO_DOMAIN
-      - MINIO_REGION_NAME=$MINIO_REGION_NAME
-      - MINIO_REGION=$MINIO_REGION
+      # - MINIO_DOMAIN=$MINIO_DOMAIN
+      # - MINIO_REGION_NAME=$MINIO_REGION_NAME
+      # - MINIO_REGION=$MINIO_REGION
     ports:
       - 9001:9001
       - 9000:9000
     volumes:
-      - ../data_example:/minio_data/raw
-      - ../eda/dataframes:/minio_data/eda
+      - ./data_example:/minio_data/raw
+      - ./eda/dataframes:/minio_data/eda
     entrypoint: >
       /bin/sh -c "
       minio server /data --console-address ':9001' &
@@ -34,20 +32,38 @@ services:
       mc mb myminio/raw;
       mc mb myminio/eda;
       mc mb myminio/lakehouse;
+      mc mb myminio/warehouse;
       mc cp --recursive /minio_data/raw/* myminio/raw;
       mc cp --recursive /minio_data/eda/* myminio/eda;
       tail -f /dev/null"
-    networks:
-      data-lakehouse:
+    env_file: ./.env
   nessie:
     image: projectnessie/nessie:latest
     container_name: nessie
     volumes:
-      - ../nessie-data:/nessie/data
+      - ./nessie-data:/nessie/data
     ports:
       - 19120:19120
-    networks:
-      data-lakehouse:
+  etl_dev:
+    image: jupyter/pyspark-notebook:spark-3.3.0
+    container_name: etl_dev
+    env_file: ./.env
+    volumes:
+      - ./notebooks:/home/jovyan/work/notebooks
+    ports:
+      - 8888:8888
+  etl:
+    image: alexmerced/spark33-notebook
+    container_name: etl
+    env_file: ./.env
+  postgres:
+    image: postgres:12.19
+    container_name: postgres
+    env_file: ./.env
+    ports:
+      - 5432:5432
 
 networks:
-  data-lakehouse:
+  default:
+    name: lakehouse
+    driver: bridge

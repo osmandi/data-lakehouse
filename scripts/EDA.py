@@ -62,13 +62,13 @@ books["publishedDate"] = pd.json_normalize(books["publishedDate"])
 books["publishedDate"] = pd.to_datetime(books["publishedDate"])
 
 ##  Terrazas
-terrazas = pd.read_csv(f"{raw_data_dir}/Terrazas_202104.csv", sep=";", encoding="latin-1")
+terrazas = pd.read_csv(f"{raw_data_dir}/Terrazas_202104.csv", sep=";", encoding="latin-1", decimal=",", thousands=".")
 
 ## Locales
-locales = pd.read_csv(f"{raw_data_dir}/Locales_202104.csv", sep=";", encoding="latin-1").dropna(axis=1, how="all")
+locales = pd.read_csv(f"{raw_data_dir}/Locales_202104.csv", sep=";", encoding="latin-1", decimal=",", thousands=".").dropna(axis=1, how="all")
 
 ## Terrazas
-licencias = pd.read_csv(f"{raw_data_dir}/Licencias_Locales_202104.csv", sep=";", encoding="latin-1")
+licencias = pd.read_csv(f"{raw_data_dir}/Licencias_Locales_202104.csv", sep=";", encoding="latin-1", decimal=",", thousands=".")
 
 # Generate EDA
 generate_eda(locales, "Locales_202104", eda_report_dir)
