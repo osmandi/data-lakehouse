@@ -13,11 +13,8 @@ services:
     image: minio/minio
     container_name: minio
     environment:
-      - MINIO_ROOT_USER=$MINIO_ROOT_USER
-      - MINIO_ROOT_PASSWORD=$MINIO_ROOT_PASSWORD
-      # - MINIO_DOMAIN=$MINIO_DOMAIN
-      # - MINIO_REGION_NAME=$MINIO_REGION_NAME
-      # - MINIO_REGION=$MINIO_REGION
+      - MINIO_ROOT_USER=$AWS_ACCESS_KEY_ID
+      - MINIO_ROOT_PASSWORD=$AWS_SECRET_ACCESS_KEY
     ports:
       - 9001:9001
       - 9000:9000
