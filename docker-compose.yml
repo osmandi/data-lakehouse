@@ -1,7 +1,7 @@
 services:
   dremio:
     platform: linux/x86_64
-    image: dremio/dremio-oss:25.1
+    image: docker.io/dremio/dremio-oss:25.1
     ports:
       - 9047:9047
       - 31010:31010
@@ -9,8 +9,11 @@ services:
     container_name: dremio
     environment:
       - DREMIO_JAVA_SERVER_EXTRA_OPTS=-Dpaths.dist=file:///opt/dremio/data/dist
+    depends_on:
+      - minio
+      - nessie
   minio:
-    image: minio/minio
+    image: docker.io/minio/minio
     container_name: minio
     environment:
       - MINIO_ROOT_USER=$AWS_ACCESS_KEY_ID
@@ -20,53 +23,20 @@ services:
       - 9000:9000
     volumes:
       - ./data_example:/minio_data/raw
-      - ./eda/dataframes:/minio_data/eda
     entrypoint: >
       /bin/sh -c "
       minio server /data --console-address ':9001' &
       sleep 5;
       mc alias set myminio http://localhost:9000 $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY;
       mc mb myminio/raw;
-      mc mb myminio/eda;
-      mc mb myminio/lakehouse;
-      mc mb myminio/warehouse;
+      mc mb myminio/metadata;
       mc cp --recursive /minio_data/raw/* myminio/raw;
-      mc cp --recursive /minio_data/eda/* myminio/eda;
       tail -f /dev/null"
     env_file: ./.env
   nessie:
-    image: projectnessie/nessie:latest
+    image: docker.io/projectnessie/nessie:latest
     container_name: nessie
     volumes:
       - ./nessie-data:/nessie/data
     ports:
       - 19120:19120
-  etl_dev:
-    image: jupyter/pyspark-notebook:spark-3.3.0
-    container_name: etl_dev
-    env_file: ./.env
-    volumes:
-      - ./notebooks:/home/jovyan/work/notebooks
-    ports:
-      - 8888:8888
-
-  etl:
-    image: alexmerced/spark33-notebook
-    container_name: etl
-    env_file: ./.env
-    volumes:
-      - ./scripts:/home/docker/scripts
-    command: >
-      /bin/bash -c "python3 /home/docker/scripts/ETL.py"
-
-  postgres:
-    image: postgres:12.19
-    container_name: postgres
-    env_file: ./.env
-    ports:
-      - 5432:5432
-
-networks:
-  default:
-    name: lakehouse
-    driver: bridge
