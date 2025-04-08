@@ -1,8 +1,0 @@
-FROM jupyter/datascience-notebook:python-3.10
-
-COPY requirements_eda.txt requirements_eda.txt
-
-# Install requirements and change to dark theme in Jupyter Lab
-RUN pip install -r requirements_eda.txt \
-  && mkdir -p $HOME/.jupyter/lab/user-settings/@jupyterlab/apputils-extension \
-  && echo '{"theme":"JupyterLab Dark"}' > $HOME/.jupyter/lab/user-settings/@jupyterlab/apputils-extension/themes.jupyterlab-settings 
